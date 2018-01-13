@@ -14,8 +14,8 @@ int main() {
 	double totalSpec = 0;
 	double maxWave = 0;
 	int errorCode;
-	int open = seabreeze_open_spectrometer(0,&errorCode); //Opens device attached to system
-	if (open == 1) {
+	int open = seabreeze_open_spectrometer(0,&errorCode); //Opens device attached to system if there is one
+	if (open == 1) { //If no device opened, program exits
 		printf("--NO SPECTROMETER FOUND--\n");
 		return 0;
 	}

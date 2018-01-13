@@ -7,7 +7,6 @@
 #include <errno.h>
 #include "api/SeaBreezeWrapper.h"
 #include <unistd.h>
-#include <time.h>
 
 int getColor();
 
