@@ -1,2 +1,4 @@
-all: main.c
-	gcc main.c -lseabreeze -lusb -o main
+all:
+	gcc main.c -lseabreeze -lusb -g -o main
+	gcc color.c -lseabreeze -lusb -g -o color
+
