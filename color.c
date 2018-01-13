@@ -1,3 +1,10 @@
+/* 
+ * This program takes input from the spectrometer, then based on its spectrum readings,
+ * it determines the color of an LED it is pointed at.
+ * As is, the program just runs until you kill the window it's in. Not important to make it pretty,
+ * but it'd be hella cool if we did.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,30 +33,31 @@ double waveStart[11] ={
 int errorCode;
 
 int main() {
-	int open = seabreeze_open_spectrometer(0,&errorCode); //Opens device attached to system
+	int open = seabreeze_open_spectrometer(0,&errorCode); //Opens device attached to system if there is one
 	if (open == 0) {
 		for (;;) {
 			getColor();
-			sleep(1);
+			sleep(1); //Waits one second before getting color again
 		}
-		seabreeze_close_spectrometer(0, &errorCode);
+		seabreeze_close_spectrometer(0, &errorCode); //CLoses device
 	}
-	else
+	else //Exits program if no device is opened
 		printf("--NO SPECTROMETER FOUND--\n");
 	return 0;
 }
 
 int getColor() {
+
 	double maxSpec = 0;
 	double maxWave = 0;
 	char model[16];
-	seabreeze_get_model(0,&errorCode,model, sizeof(model)); //Returns string denoting type of device
+
 	int pixels = seabreeze_get_formatted_spectrum_length(0, &errorCode); //Acquires a spectrum and returns answer in formatted floats
-	double *spectrum = (double*) malloc(pixels * sizeof(double));
+
 	double *wavelength = (double*) malloc(pixels * sizeof(double));
 	seabreeze_get_wavelengths(0,&errorCode,wavelength,pixels); //Computes wavelengths for the spectrometer and fills "wavelength" array with those values up to "pixels" value
-	spectrum[0]=0;
-	seabreeze_set_integration_time_microsec(0, &errorCode, 10000); //Sets integration time to 10000 microseconds
+
+	double *spectrum = (double*) malloc(pixels * sizeof(double));
 	seabreeze_get_formatted_spectrum(0,&errorCode,spectrum,pixels); //Acquires the spectrum and returns in formatted floats and places this in the "spectrum" array up to "pixels" value
 
 	for(int i = 0; i<pixels; i += 5){
@@ -61,12 +69,12 @@ int getColor() {
 		}
 	}
 	int LED = 0;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) { //Compares wavelength of max spectrum reading to determine color based on colors array
 		if (maxWave < waveStart[i] && maxWave >= waveStart[i + 1] && maxSpec > 5000 && LED == 0) {
 			printf("%s\n", colors[i]);
 			LED = 1;
 		}
 	}
-	if (LED == 0)
+	if (LED == 0) //If light source is not bright enough
 		printf("NO LED\n");
 }
